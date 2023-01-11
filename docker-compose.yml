@@ -1,0 +1,7 @@
+version: "3.4"
+
+services:
+  intelgpt:
+    build: .
+    env_file:
+      - .env
