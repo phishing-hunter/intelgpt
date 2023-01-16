@@ -50,10 +50,12 @@ Please make sure to keep your API keys private and never share them with anyone.
 * `--hash`: Investigate the given file hash. Example: docker-compose run intelgpt --hash fafe11f23567080fb14cfd3b51cb440b9c097804569402d720fd32dd66059830
 * `--domain`: Investigate the given domain name. Example: docker-compose run intelgpt --domain example.com
 * `--ip`: Investigate the given IP address. Example: docker-compose run intelgpt --ip 192.168.1.1
+* `--lang`: Output the result in the specified language. Example: docker-compose run intelgpt --url http://example.com --lang english
 
 You can also use the help option to see the usage instructions for the tool:
 ```bash
 docker-compose run intelgpt --help
+docker-compose run intelgpt --hash fafe11f23567080fb14cfd3b51cb440b9c097804569402d720fd32dd66059830 --lang english
 ```
 
 ## References
