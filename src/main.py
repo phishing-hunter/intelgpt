@@ -10,10 +10,10 @@ from langchain.chains.conversation.memory import ConversationBufferMemory
 from langchain import OpenAI, SerpAPIWrapper, LLMChain, LLMMathChain, LLMBashChain
 from langchain.agents import ZeroShotAgent, Tool, AgentExecutor, load_tools, initialize_agent
 
-def generate_prompt(identifier:str,input_value:str):
+def generate_prompt(identifier:str,input_value:str, lang:str):
     if identifier in ["url", "domain"]:
         prompt = f"""
-以下の手順を使ってURL({input_value})の調査を行い、悪意の有無について「日本語」で出力してください。
+以下の手順を使ってURL({input_value})の調査を行い、悪意の有無について「{lang}」で出力してください。
 * digコマンドを使って入力されたドメイン名からIPアドレスを取得します。
 * whoisコマンドを使ってWhois情報を取得します。
 * shodanコマンドを使ってサーバの情報を取得します。(コマンドの使い方`shodan host 189.201.128.250`)
@@ -25,7 +25,7 @@ def generate_prompt(identifier:str,input_value:str):
 
     if identifier == "ip":
         prompt = f"""
-以下の手順を使ってIPアドレス({input_value})の調査を行い、悪意の有無について「日本語」で出力してください。
+以下の手順を使ってIPアドレス({input_value})の調査を行い、悪意の有無について「{lang}」で出力してください。
 * whoisコマンドを使ってWhois情報を取得します。
 * shodanコマンドを使ってサーバの情報を取得します。(コマンドの使い方`shodan host 189.201.128.250`)
 * IPアドレスをgoogleで検索する
@@ -38,7 +38,7 @@ def generate_prompt(identifier:str,input_value:str):
 
     if identifier == "hash":
        prompt = f"""
-以下の手順を使ってHash({input_value})の調査を行い、悪意の有無について「日本語」で出力してください。
+以下の手順を使ってHash({input_value})の調査を行い、悪意の有無について「{lang}」で出力してください。
 * ハッシュ値をGoogle検索する
 
 判定基準
@@ -51,8 +51,9 @@ def generate_prompt(identifier:str,input_value:str):
 @click.option("--hash", "identifier", flag_value="hash", help="Investigate based on file hash.")
 @click.option("--domain", "identifier", flag_value="domain", help="Investigate based on domain name.")
 @click.option("--ip", "identifier", flag_value="ip", help="Investigate based on IP address.")
+@click.option("--lang", "lang", default="日本語", help="Language to output in.")
 @click.argument("input_value")
-def main(identifier: str, input_value: str):
+def main(identifier: str, input_value: str, lang:str):
     # ツールの準備
     llm = OpenAI(temperature=0)
     tools = load_tools(["terminal", "google-search"], llm=llm)
@@ -67,7 +68,7 @@ def main(identifier: str, input_value: str):
     )
 
     memory = ConversationBufferMemory(memory_key="chat_history")
-    prompt = generate_prompt(identifier, input_value)
+    prompt = generate_prompt(identifier, input_value, lang)
     agent = initialize_agent(tools, llm, agent="zero-shot-react-description", verbose=True)
     agent.run(prompt)
 
